@@ -1,0 +1,11 @@
+﻿{
+  "Id": "TheBestDefense",
+  "DisplayName": "TheBestDefense",
+  "Author": "Fuklebark",
+  "Version": "1.0.0",
+  "Requires": [ ],
+  "Enable": true,
+  "AssemblyName": "TheBestDefense.dll",
+  "EntryMethod": "TheBestDefense.QPatch.Patch",
+  "Config": {}
+}
