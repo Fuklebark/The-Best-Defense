@@ -6,6 +6,6 @@
   "Requires": [ ],
   "Enable": true,
   "AssemblyName": "TheBestDefense.dll",
-  "EntryMethod": "The Best Defense.Main.Patch",
+  "EntryMethod": "TheBestDefense.Main.Patch",
   "Config": {}
 }
