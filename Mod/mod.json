@@ -1,11 +1,11 @@
 ﻿{
   "Id": "TheBestDefense",
-  "DisplayName": "TheBestDefense",
+  "DisplayName": "The Best Defense",
   "Author": "Fuklebark",
   "Version": "1.0.0",
   "Requires": [ ],
   "Enable": true,
   "AssemblyName": "TheBestDefense.dll",
-  "EntryMethod": "TheBestDefense.QPatch.Patch",
+  "EntryMethod": "The Best Defense.Main.Patch",
   "Config": {}
 }
