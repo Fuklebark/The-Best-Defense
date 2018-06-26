@@ -19,14 +19,16 @@
         public static TechType NukeTorpedoTechType;
         public const string NukeNameID = "NukeTorpedo";
         public const string NukeFriendlyName = "MicroNuke Torpedo";
-        public const string NukeDescription = "A highly miniaturized and clean fission warhead. Landscaping or sports use discouraged.";
+        public const string NukeDescription = "A highly miniaturized  clean fission warhead. Landscaping or sports use discouraged.";
 
-        public static void Patch(AssetBundle assetBundle)
+        public static void Patch()
         {
             #region Harmony Patch
             HarmonyInstance harmony = HarmonyInstance.Create("com.Fuklebark.TheBestDefense");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             #endregion
+
+            var assetBundle = AssetBundle.LoadFromFile(@"./QMods/TheBestDefense/TheBestDefense.assets");
 
             // Create a new TechType
             ConcussionTorpedoTechType = TechTypePatcher.AddTechType(ConcussionNameID, ConcussionFriendlyName, ConcussionDescription, unlockOnGameStart: true);
@@ -38,7 +40,7 @@
 
             // Get the custom icon from the Unity assets bundle
             CustomSpriteHandler.customSprites.Add(new CustomSprite(ConcussionTorpedoTechType, assetBundle.LoadAsset<Sprite>("ConcussionTorpedo")));
-            CustomSpriteHandler.customSprites.Add(new CustomSprite(ConcussionTorpedoTechType, assetBundle.LoadAsset<Sprite>("NukeTorpedo")));
+            CustomSpriteHandler.customSprites.Add(new CustomSprite(NukeTorpedoTechType, assetBundle.LoadAsset<Sprite>("NukeTorpedo")));
 
             // Add the new recipe to the Vehicle Station crafting tree
             CraftTreePatcher.customNodes.Add(new CustomCraftNode(ConcussionTorpedoTechType, CraftTree.Type.SeamothUpgrades, $"TorpedoesMenu /{ConcussionNameID}"));
@@ -89,7 +91,7 @@
                 _ingredients = new List<IngredientHelper>(new IngredientHelper[3]
                     {
                         new IngredientHelper(TechType.Titanium, 2),
-                        new IngredientHelper(TechType.UraniniteCrystal, 2),
+                        new IngredientHelper(TechType.UraniniteCrystal, 4),
                         new IngredientHelper(TechType.Lead, 2)
                     }),
                 _techType = NukeTorpedoTechType,
@@ -101,25 +103,67 @@
         //Copies and modifies the gastorpedo PreFab to represent the new torpedo types (I think?)
         public static GameObject GetConcussionTorpedoObject()
         {
-            GameObject prefab = Resources.Load<GameObject>("WorldEntities/Tools/gastorpedo");
-            GameObject obj = Object.Instantiate(prefab);
+            var prefab = Resources.Load<GameObject>("WorldEntities/Tools/WhirlpoolTorpedo");
+            var obj = GameObject.Instantiate(prefab);
 
-            obj.GetComponent<PrefabIdentifier>().ClassId = ConcussionNameID;
-            obj.GetComponent<TechTag>().type = ConcussionTorpedoTechType;
+            var identifier = obj.GetComponent<PrefabIdentifier>();
+            var techTag = obj.GetComponent<TechTag>();
+
+            identifier.ClassId = ConcussionNameID;
+            techTag.type = ConcussionTorpedoTechType;
 
             return obj;
         }
 
         public static GameObject GetNukeTorpedoObject()
         {
-            GameObject prefab = Resources.Load<GameObject>("WorldEntities/Tools/gastorpedo");
-            GameObject obj = Object.Instantiate(prefab);
+            var prefab = Resources.Load<GameObject>("WorldEntities/Tools/WhirlpoolTorpedo");
+            var obj = GameObject.Instantiate(prefab);
 
-            obj.GetComponent<PrefabIdentifier>().ClassId = NukeNameID;
-            obj.GetComponent<TechTag>().type = NukeTorpedoTechType;
+            var identifier = obj.GetComponent<PrefabIdentifier>();
+            var techTag = obj.GetComponent<TechTag>();
 
-            return obj;
+            identifier.ClassId = NukeNameID;
+            techTag.type = NukeTorpedoTechType;
+
+            TorpedoType NukeTorpedoType = new TorpedoType();
+            this.torpedoType.techType = NukeTorpedoTechType;
+            this.torpedoType.prefab = myPrefab;
+            
+return obj;
+
         }
         #endregion
     }
+
+    #region TorpedoType Patcher
+    [HarmonyPatch(typeof(Vehicle))]
+    [HarmonyPatch("Awake")]
+
+    public class MyHarmonyPatches
+    {
+        TorpedoType ConcussionTorpedoType = new TorpedoType()
+        ;
+        TorpedoType NukeTorpedoType = new TorpedoType(Main.NukeTorpedoTechType, Main.NukeNameID);
+
+        static void MyVehiclePostfix(Vehicle __instance)
+        {
+            __instance.torpedoTypes.Add(Main.ConcussionTorpedoType);
+            __instance.torpedoTypes.Add(NukeTorpedoType)
+        };         
+            
+        /*
+          TorpedoType Definition from dnSpy - Assembly-CSharp.dll
+            [Serializable]
+            public class TorpedoType
+        {
+            // Token: 0x040036D7 RID: 14039
+            public TechType techType;
+
+            // Token: 0x040036D8 RID: 14040
+            public GameObject prefab;
+        }
+        */
+    }
+
 }
